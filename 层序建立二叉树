@@ -1,1 +1,111 @@
+#include<stdio.h>
+#include<malloc.h>
 
+typedef struct TreeNode {
+	char data;
+	struct TreeNode* left;
+	struct TreeNode* right;
+}TreeNode,*BinTree;
+
+typedef BinTree ElemType;
+
+typedef struct QNode {
+	ElemType data;
+	struct QNode* next;
+}QNode,*QueueNode;
+
+typedef struct LQueue {
+	QueueNode front;
+	QueueNode tail;
+}LQueue,*LinkQueue;
+
+void InitQueue(LinkQueue Q) {
+	QueueNode s = (QueueNode)malloc(sizeof(QNode));
+	Q->front = Q->tail = s;
+	Q->tail->next = NULL;
+}
+
+void EnQueue(LinkQueue Q, ElemType x) {
+	QueueNode s = (QueueNode)malloc(sizeof(QNode));
+	s->data = x;
+	s->next = NULL;
+	Q->tail->next = s;
+	Q->tail = s;
+}
+
+BinTree DeQueue(LinkQueue Q) {
+	QueueNode p = Q->front->next;
+	BinTree temp = p->data;
+	Q->front->next = p->next;
+	free(p);
+	if (p == Q->tail) {
+		Q->tail = Q->front;
+	}
+	return temp;
+}
+
+void ShowQueue(LinkQueue Q) {
+	QueueNode p = Q->front->next;
+	while (p != NULL) {
+		printf("%c", p->data->data);
+		p = p->next;;
+	}
+}
+
+int IsEmpty(LinkQueue Q) {
+	if (Q->front == Q->tail) {
+		return 1;
+	}
+	return 0;
+}
+
+BinTree CreateBinTree(BinTree BT) {
+	char a;
+	LinkQueue Q = (LinkQueue)malloc(sizeof(LQueue));
+	InitQueue(Q);
+	BinTree T;
+	scanf("%c", &a);
+	if(a!='#'){
+		BT= (BinTree)malloc(sizeof(TreeNode));
+		BT->data = a;
+		EnQueue(Q, BT);
+	}
+	else {
+		return NULL;
+	}
+	while (!IsEmpty(Q)) {
+		T = DeQueue(Q);
+		scanf("%c", &a);
+		T->left = (BinTree)malloc(sizeof(TreeNode));
+		T->left->data = a;
+		T->left->left = T->left->right = NULL;
+		if (a != '#') {
+			EnQueue(Q, T->left);
+		}
+		scanf("%c", &a);
+		T->right = (BinTree)malloc(sizeof(TreeNode));
+		T->right->data = a;
+		T->right->left = T->right->right = NULL;
+		if (a != '#') {
+			EnQueue(Q, T->right);
+		}
+	}
+	return BT;
+}
+
+void PreOrder(BinTree Node)
+{
+	if (Node == NULL) {
+		return;
+	}
+	printf("%c", Node->data);
+	PreOrder(Node->left);
+	PreOrder(Node->right);
+}
+
+int main() {
+	BinTree BT = (BinTree)malloc(sizeof(TreeNode));
+	BT = CreateBinTree(BT);
+	PreOrder(BT);
+	return 0;
+}
